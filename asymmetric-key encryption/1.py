@@ -1,4 +1,3 @@
-from Crypto.Cipher import AES
 from cryptography.fernet import Fernet
 from Crypto.PublicKey import RSA
 from Crypto.Cipher import PKCS1_OAEP
