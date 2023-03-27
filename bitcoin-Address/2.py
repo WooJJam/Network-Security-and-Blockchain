@@ -82,13 +82,16 @@ def double_and_add(x, G: list):
 
     return tuple(K)
 
-def set_corresponding_public_key(e1, ex):
+def set_corresponding_public_key(private_key):
+    e1 = double_and_add(private_key, G)
+    ex = hex(e1[0])
+    
     if(e1[1]%2 == 0):
         public_key ="02"+str(ex[2:])
     else:
         public_key ="03"+str(ex[2:])
     
-    return public_key
+    return public_key, ex
 
 def sha_hasing(shaText):
     shaText = bytes.fromhex(shaText)
@@ -100,18 +103,9 @@ def ripemd160_hash(ripemdText):
     h.update(bytes.fromhex(ripemdText))
     ripemd_hash = h.digest().hex()
     return ripemd_hash
-    
-def get_address(private_key):
-    e1 = double_and_add(private_key, G)
-    ex = hex(e1[0])
-    
-    if(len(ex)!=66):
-        while(True):
-            if(len(ex) ==66):
-                break
-            ex += 'f'
-            
-    public_key = set_corresponding_public_key(e1, ex)
+
+def get_address(public_key):
+     
     shaText = sha_hasing(public_key)
     ripemd_hash = ripemd160_hash(shaText)
     public_key_hash = '00' + ripemd_hash
@@ -135,9 +129,12 @@ if __name__ == "__main__":
 
     while(True):
         private_key = get_private_key()
-        address = get_address(private_key)
+        public_key, ex = set_corresponding_public_key(private_key)
+        if(len(ex) != 66):
+            continue
+        address = get_address(public_key)
         index = address.find(text)
-        if(index != -1):
+        if(index == 1):
             print(f"개인 키 = {hex(private_key)[2:]}")
             print(f"주소 = {address}")
             break
